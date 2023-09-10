@@ -7,9 +7,16 @@
 {
   imports =
     [ # Include the results of the hardware scan.
-      <nixos-hardware/lenovo/thinkpad/t450s>
+      #<nixos-hardware/lenovo/thinkpad/t450s> # does not work with flakes
       ./hardware-configuration.nix
     ];
+
+  nix = {
+    package = pkgs.nixFlakes;
+    extraOptions = ''
+      experimental-features = nix-command flakes
+    '';
+  };
 
   # Hardware
   hardware.trackpoint.enable = true;
@@ -52,8 +59,30 @@
   services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  #services.xserver.displayManager.gdm.enable = true;
+  #services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.displayManager.startx.enable = true;
+  #services.xserver.windowManager.dwm.enable = true;
+
+  #nixpkgs.overlays = [
+  #  (final: prev: {
+  #    dwm = prev.dwm.overrideAttrs (old: {
+  #      src = builtins.fetchGit {
+  #        url = "https://github.com/nullbyto/dwm";
+  #        ref = "config";
+  #      };
+  #      buildInputs = old.buildInputs ++ [ pkgs.imlib2 ];
+  #    });
+  #  })
+  #];
+  # dwm is not allowed to be in environment.systemPackages or home.packages
+  #services.xserver.windowManager.dwm.package = pkgs.dwm.overrideAttrs (old: {
+  #  src = builtins.fetchGit {
+  #    url = "https://github.com/nullbyto/dwm";
+  #    ref = "config";
+  #  };
+  #  buildInputs = old.buildInputs ++ [ pkgs.imlib2 ];
+  #});
 
   # Configure keymap in X11
   services.xserver = {
@@ -89,6 +118,7 @@
   # Enable touchpad support (enabled default in most desktopManager).
   services.xserver.libinput.enable = true;
   services.xserver.libinput.touchpad.naturalScrolling = true;
+  #services.xserver.synaptics.enable = true;
 
   nixpkgs.config.allowUnfree = true;
 
@@ -139,6 +169,10 @@
     polkit
     brightnessctl
     redshift
+    xorg.xrandr
+    xorg.xrdb
+    xorg.xev
+    xorg.xinput
   ];
 
   # Fonts
