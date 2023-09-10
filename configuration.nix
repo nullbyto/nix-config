@@ -7,12 +7,19 @@
 {
   imports =
     [ # Include the results of the hardware scan.
+      <nixos-hardware/lenovo/thinkpad/t450s>
       ./hardware-configuration.nix
     ];
+
+  # Hardware
+  hardware.trackpoint.enable = true;
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -50,7 +57,7 @@
 
   # Configure keymap in X11
   services.xserver = {
-    layout = "us";
+    layout = "eu";
     xkbVariant = "";
   };
 
@@ -74,8 +81,14 @@
     #media-session.enable = true;
   };
 
+  # Enable blueman/bluetooth
+  services.blueman.enable = true;
+  # Enable security key service for YubiKey
+  services.pcscd.enable = true;
+
   # Enable touchpad support (enabled default in most desktopManager).
   services.xserver.libinput.enable = true;
+  services.xserver.libinput.touchpad.naturalScrolling = true;
 
   nixpkgs.config.allowUnfree = true;
 
@@ -91,11 +104,46 @@
     ];
   };
 
+  programs.zsh.enable = true;
+  environment.shells = with pkgs; [ zsh ];
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    wget
+    git
+    htop
+    vim
+    bat
+    tmux
+    fzf
+    xclip
+    direnv
+    rnix-lsp
+    chezmoi
+    python3
+    python3Packages.pip
+    nodejs
+    nodePackages.npm
+    networkmanager
+    networkmanagerapplet
+    blueman
+    bluez
+    dnsutils
+    arandr
+    pulseaudio
+    pavucontrol
+    alsa-utils
+    pamixer
+    polkit
+    brightnessctl
+    redshift
+  ];
+
+  # Fonts
+  fonts.fonts = with pkgs; [
+    terminus_font
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
