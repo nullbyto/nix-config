@@ -9,6 +9,7 @@
     [ # Include the results of the hardware scan.
       #<nixos-hardware/lenovo/thinkpad/t450s> # does not work with flakes
       ./hardware-configuration.nix
+      inputs.xremap-flake.nixosModules.default
     ];
 
   nix = {
@@ -22,6 +23,17 @@
   hardware.trackpoint.enable = true;
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
+
+  # Flakes
+  services.xremap = {
+    withX11 = true;
+    userName = "amin";
+    watch = true;
+    yamlConfig = builtins.readFile (builtins.fetchurl { 
+      url = https://raw.githubusercontent.com/nullbyto/dotfiles/master/dot_config/xremap.yml;
+      sha256 = "13m8wcyfcpr5x86g56akwdnsjsmhwjwnjjym86pv9da01ll301nh";
+    });
+  };
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
