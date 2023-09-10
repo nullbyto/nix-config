@@ -12,8 +12,9 @@
     # which represents the GitHub repository URL + branch/commit-id/tag.
 
     # Official NixOS package source, using nixos-unstable branch here
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
     #nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+
     # home-manager, used for managing user configuration
     home-manager = {
       url = "github:nix-community/home-manager/release-23.05";
@@ -39,7 +40,16 @@
   # 
   # The `@` syntax here is used to alias the attribute set of the
   # inputs's parameter, making it convenient to use inside the function.
-  outputs = { self, nixpkgs, nixos-hardware, ... }@inputs: {
+  outputs = { self, nixpkgs, nixos-hardware, home-manager, ... }@inputs: 
+    let
+      system = "x86_64-linux";
+      #pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = import nixpkgs { 
+        inherit system;
+        config.allowUnfree = true;
+      };
+    in
+    {
     nixosConfigurations = {
       # By default, NixOS will try to refer the nixosConfiguration with
       # its hostname, so the system named `nixos-test` will use this one.
@@ -53,7 +63,8 @@
       # deploy this configuration on any NixOS system:
       #   sudo nixos-rebuild switch --flake .#nixos-test
       "nixos" = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+        inherit system;
+        #system = "x86_64-linux";
 
         # The Nix module system can modularize configuration,
         # improving the maintainability of configuration.
@@ -97,10 +108,24 @@
           # Import the configuration.nix here, so that the
           # old configuration file can still take effect.
           # Note: configuration.nix itself is also a Nix Module,
-          ./configuration.nix
+          ./system/configuration.nix
           nixos-hardware.nixosModules.lenovo-thinkpad-t450s
         ];
       };
+    };
+
+    homeConfigurations."amin" = home-manager.lib.homeManagerConfiguration {
+      inherit pkgs;
+
+      # Specify your home configuration modules here, for example,
+      # the path to your home.nix.
+      modules = [
+        ./home/home.nix
+      ];
+
+      # Optionally use extraSpecialArgs
+      # to pass through arguments to home.nix
+      extraSpecialArgs = { inherit inputs; };
     };
   };
 }
