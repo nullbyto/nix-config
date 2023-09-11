@@ -2,28 +2,27 @@
 
 let
   dwm = pkgs.dwm.overrideAttrs (old: {
-    # use path function, since names starting with a dot are not allowed in nix store
-    src = builtins.path { path = "/home/amin/.dwm"; name = "dwm"; };
-    #src = builtins.fetchGit {
-    #  url = "https://github.com/nullbyto/dwm";
-    #  ref = "config";
-    #};
+    src = builtins.fetchGit {
+      url = "https://github.com/nullbyto/dwm";
+      ref = "nixos";
+      rev = "52454d25ef5ebd4e8f72f00a858b1123778c5287";
+    };
     buildInputs = old.buildInputs ++ [ pkgs.imlib2 ];
   });
 
   dwmblocks = pkgs.dwmblocks.overrideAttrs (old: {
-    # use path function, since names starting with a dot are not allowed in nix store
-    src = builtins.path { path = "/home/amin/.dwmblocks-async"; name = "dwmblocks"; };
-    #src = builtins.fetchGit {
-    #  url = "https://github.com/nullbyto/dwmblocks-async";
-    #  ref = "main";
-    #};
+    src = builtins.fetchGit {
+      url = "https://github.com/nullbyto/dwmblocks-async";
+      ref = "laptop";
+      rev = "12140870a42f19d15c1242df8e4b3522033c484e";
+    };
   });
 
   dmenu = pkgs.dmenu.overrideAttrs (old: {
     src = builtins.fetchGit {
       url = "https://github.com/nullbyto/dmenu-flexipatch";
       ref = "master";
+      rev = "db49ecc856bb540f287634b786c3cabdd67e60fd";
     };
   });
 in
