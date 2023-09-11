@@ -2,18 +2,22 @@
 
 let
   dwm = pkgs.dwm.overrideAttrs (old: {
-    src = builtins.fetchGit {
-      url = "https://github.com/nullbyto/dwm";
-      ref = "config";
-    };
+    # use path function, since names starting with a dot are not allowed in nix store
+    src = builtins.path { path = "/home/amin/.dwm"; name = "dwm"; };
+    #src = builtins.fetchGit {
+    #  url = "https://github.com/nullbyto/dwm";
+    #  ref = "config";
+    #};
     buildInputs = old.buildInputs ++ [ pkgs.imlib2 ];
   });
 
   dwmblocks = pkgs.dwmblocks.overrideAttrs (old: {
-    src = builtins.fetchGit {
-      url = "https://github.com/nullbyto/dwmblocks-async";
-      ref = "main";
-    };
+    # use path function, since names starting with a dot are not allowed in nix store
+    src = builtins.path { path = "/home/amin/.dwmblocks-async"; name = "dwmblocks"; };
+    #src = builtins.fetchGit {
+    #  url = "https://github.com/nullbyto/dwmblocks-async";
+    #  ref = "main";
+    #};
   });
 
   dmenu = pkgs.dmenu.overrideAttrs (old: {
