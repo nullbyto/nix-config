@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, pkgs-unstable, inputs, ... }:
 
 let
   dwm = pkgs.dwm.overrideAttrs (old: {
@@ -97,7 +97,15 @@ in
     pkgs.papirus-icon-theme
     pkgs.catppuccin-gtk
     pkgs.betterlockscreen
+    pkgs.rnix-lsp 
+    pkgs.discord
   ];
+  
+  programs.starship = {
+    enable = true;
+    # Configuration written to ~/.config/starship.toml
+    #settings = {};
+  };
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.

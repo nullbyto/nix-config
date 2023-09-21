@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, pkgs-unstable, inputs, ... }:
 
 {
   imports =
@@ -34,6 +34,9 @@
       sha256 = "13m8wcyfcpr5x86g56akwdnsjsmhwjwnjjym86pv9da01ll301nh";
     });
   };
+
+  virtualisation.virtualbox.host.enable = true;
+  users.extraGroups.vboxusers.members = [ "amin" ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -73,28 +76,11 @@
   # Enable the GNOME Desktop Environment.
   #services.xserver.displayManager.gdm.enable = true;
   #services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.displayManager.lightdm.enable = true;
   services.xserver.displayManager.startx.enable = true;
-  #services.xserver.windowManager.dwm.enable = true;
-
-  #nixpkgs.overlays = [
-  #  (final: prev: {
-  #    dwm = prev.dwm.overrideAttrs (old: {
-  #      src = builtins.fetchGit {
-  #        url = "https://github.com/nullbyto/dwm";
-  #        ref = "config";
-  #      };
-  #      buildInputs = old.buildInputs ++ [ pkgs.imlib2 ];
-  #    });
-  #  })
-  #];
-  # dwm is not allowed to be in environment.systemPackages or home.packages
-  #services.xserver.windowManager.dwm.package = pkgs.dwm.overrideAttrs (old: {
-  #  src = builtins.fetchGit {
-  #    url = "https://github.com/nullbyto/dwm";
-  #    ref = "config";
-  #  };
-  #  buildInputs = old.buildInputs ++ [ pkgs.imlib2 ];
-  #});
+  #services.xserver.displayManager.defaultSession = "none+dwm";
+  # installs dwm alongside its .desktop entry
+  services.xserver.windowManager.dwm.enable = true;
 
   # Configure keymap in X11
   services.xserver = {
@@ -131,6 +117,8 @@
   services.xserver.libinput.enable = true;
   services.xserver.libinput.touchpad.naturalScrolling = true;
   #services.xserver.synaptics.enable = true;
+
+  security.polkit.enable = true;
 
   nixpkgs.config.allowUnfree = true;
 
@@ -178,13 +166,14 @@
     pavucontrol
     alsa-utils
     pamixer
-    polkit
     brightnessctl
     redshift
     xorg.xrandr
     xorg.xrdb
     xorg.xev
     xorg.xinput
+    # for flatpak software
+    gnome.gnome-software
   ];
 
   # Fonts
@@ -201,6 +190,14 @@
   # };
 
   # List services that you want to enable:
+
+  services.flatpak.enable = true;
+  # xdg portal needed for flatpaks
+  xdg.portal.enable = true;
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+
+  # Tailscale VPN
+  services.tailscale.enable = true;
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;

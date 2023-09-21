@@ -14,6 +14,7 @@
     # Official NixOS package source, using nixos-unstable branch here
     #nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     # home-manager, used for managing user configuration
     home-manager = {
@@ -40,11 +41,15 @@
   # 
   # The `@` syntax here is used to alias the attribute set of the
   # inputs's parameter, making it convenient to use inside the function.
-  outputs = { self, nixpkgs, nixos-hardware, home-manager, ... }@inputs: 
+  outputs = { self, nixpkgs, nixpkgs-unstable, nixos-hardware, home-manager, ... }@inputs: 
     let
       system = "x86_64-linux";
       #pkgs = nixpkgs.legacyPackages.${system};
       pkgs = import nixpkgs { 
+        inherit system;
+        config.allowUnfree = true;
+      };
+      pkgs-unstable = import nixpkgs-unstable { 
         inherit system;
         config.allowUnfree = true;
       };
@@ -102,7 +107,7 @@
         #
         # specialArgs = {...}  # pass custom arguments into all sub module.
 
-        specialArgs = { inherit inputs; };
+        specialArgs = { inherit inputs pkgs-unstable; };
 
         modules = [
           # Import the configuration.nix here, so that the
@@ -125,7 +130,7 @@
 
       # Optionally use extraSpecialArgs
       # to pass through arguments to home.nix
-      extraSpecialArgs = { inherit inputs; };
+      extraSpecialArgs = { inherit inputs pkgs-unstable; };
     };
   };
 }
